@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABC Retail Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="email"], input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .media-preview {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>ABC Retail Management</h1>
+
+<!-- Customer Form -->
+<form id="customerForm">
+    <h2>Add Customer</h2>
+    <input type="text" id="customerName" placeholder="Name" required />
+    <input type="email" id="customerEmail" placeholder="Email" required />
+    <button type="submit">Save Customer</button>
+</form>
+
+<!-- Product Form -->
+<form id="productForm">
+    <h2>Add Product</h2>
+    <input type="text" id="productName" placeholder="Product Name" required />
+    <input type="number" id="productPrice" placeholder="Price" required />
+    <button type="submit">Save Product</button>
+</form>
+
+<!-- Multimedia Upload -->
+<input type="file" id="mediaUpload" accept="image/*" />
+<button id="uploadMedia">Upload Media</button>
+<div class="media-preview" id="mediaPreview"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/azure-storage/2.10.3/azure-storage.blob.min.js"></script>
+<script>
+    const accountName = "AZ-JHB-RSG-RCGPON-st10130534-TER"; // Replace with your Azure Storage account name
+    const accountKey = "4dd12a2f-0a9e-4b69-ba01-a9d26e10e611"; // Replace with your Azure Storage account key
+    const blobService = AzureStorage.Blob.createBlobService(accountName, accountKey);
+    const containerName = "st10130534cldv7112"; // Replace with your blob container name
+
+    document.getElementById('customerForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const name = document.getElementById('customerName').value;
+        const email = document.getElementById('customerEmail').value;
+
+        // Simulating saving to Azure Table Storage
+        console.log("Customer saved:", { name, email });
+        alert("Customer saved!");
+        this.reset();
+    });
+
+    document.getElementById('productForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const productName = document.getElementById('productName').value;
+        const productPrice = document.getElementById('productPrice').value;
+
+        // Simulating saving to Azure Table Storage
+        console.log("Product saved:", { productName, productPrice });
+        alert("Product saved!");
+        this.reset();
+    });
+
+    document.getElementById('uploadMedia').addEventListener('click', function() {
+        const fileInput = document.getElementById('mediaUpload');
+        const file = fileInput.files[0];
+
+        if (file) {
+            const blobName = file.name;
+            blobService.createBlockBlobFromBrowserFile(containerName, blobName, file, function(error, result) {
+                if (error) {
+                    console.error("Error uploading media:", error);
+                    alert("Upload failed!");
+                } else {
+                    console.log("Media uploaded:", result);
+                    document.getElementById('mediaPreview').innerHTML += `<img src="${blobService.getUrl(containerName, blobName)}" style="max-width: 100px; margin: 5px;" />`;
+                    alert("Media uploaded successfully!");
+                }
+            });
+        } else {
+            alert("Please select a file to upload.");
+        }
+    });
+</script>
+
+</body>
+</html>
